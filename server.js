@@ -19,8 +19,19 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+async function isAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: 'Unauthorized' });
+}
+
+
 const authRoutes = require('./routes/authRoutes');
 app.use('/', authRoutes);
+
+const userRoutes = require('./routes/userRoutes');
+app.use('/users', isAuthenticated, userRoutes);
 
 const PORT = process.env.PORT || 3000;
 
