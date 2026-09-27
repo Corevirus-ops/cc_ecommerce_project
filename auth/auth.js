@@ -7,10 +7,6 @@ async function verifyPassword(password, hashedPassword) {
     return await bcrypt.compare(password, hashedPassword);
 }
 
-async function hashPassword(password) {
-    const saltRounds = 10;
-    return await bcrypt.hash(password, saltRounds);
-}
 
 passport.use(new LocalStrategy(
     async (username, password, done) => {
