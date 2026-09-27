@@ -43,3 +43,18 @@ CREATE TABLE product_categories(
     PRIMARY KEY (product_id, category_id)
 );
 
+CREATE TABLE cart(
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id),
+    CONSTRAINT one_cart_per_user UNIQUE (user_id)
+);
+
+CREATE TABLE cart_items(
+    id SERIAL PRIMARY KEY,
+    cart_id INT NOT NULL REFERENCES cart(id) ON DELETE CASCADE,
+    product_id INT NOT NULL REFERENCES products(id),
+    quantity INT NOT NULL CHECK (quantity > 0),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT one_product_per_cart UNIQUE (cart_id, product_id)
+);
+

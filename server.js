@@ -36,6 +36,9 @@ app.use('/users', isAuthenticated, userRoutes);
 const productRoutes = require('./routes/productRoutes');
 app.use('/products', productRoutes);
 
+const cartRoutes = require('./routes/cartRoutes');
+app.use('/cart', isAuthenticated, cartRoutes);
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
