@@ -109,4 +109,72 @@ router.delete('/:id', async (req, res) => {
     res.status(204).json({ message: 'Cart item deleted successfully' });
 });
 
+router.post('/checkout', async (req, res, next) => {
+    const client = await pool.connect();
+
+    try {
+        await client.query('BEGIN');
+
+        const cartResult = await client.query(
+            'SELECT id FROM cart WHERE user_id = $1 FOR UPDATE',
+            [req.user.id]
+        );
+
+        if (cartResult.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ message: 'Cart not found' });
+        }
+
+        const cartId = cartResult.rows[0].id;
+        const cartItems = await client.query(
+            `SELECT cart_items.product_id, cart_items.quantity, products.price
+             FROM cart_items
+             JOIN products ON products.id = cart_items.product_id
+             WHERE cart_items.cart_id = $1
+             FOR UPDATE OF cart_items`,
+            [cartId]
+        );
+
+        if (cartItems.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ message: 'Cart is empty' });
+        }
+
+        const orderResult = await client.query(
+            `INSERT INTO orders (user_id, total)
+             SELECT $1, SUM(cart_items.quantity * products.price)
+             FROM cart_items
+             JOIN products ON products.id = cart_items.product_id
+             WHERE cart_items.cart_id = $2
+             RETURNING id, user_id, total, created_at`,
+            [req.user.id, cartId]
+        );
+        const order = orderResult.rows[0];
+
+        const orderItemsResult = await client.query(
+            `INSERT INTO order_items (order_id, product_id, quantity, price)
+             SELECT $1, cart_items.product_id, cart_items.quantity, products.price
+             FROM cart_items
+             JOIN products ON products.id = cart_items.product_id
+             WHERE cart_items.cart_id = $2
+             RETURNING id, order_id, product_id, quantity, price`,
+            [order.id, cartId]
+        );
+
+        await client.query('DELETE FROM cart_items WHERE cart_id = $1', [cartId]);
+        await client.query('COMMIT');
+
+        return res.status(201).json({
+            message: 'Checkout completed successfully',
+            order,
+            items: orderItemsResult.rows
+        });
+    } catch (err) {
+        await client.query('ROLLBACK').catch(() => {});
+        return next(err);
+    } finally {
+        client.release();
+    }
+});
+
 module.exports = router;
