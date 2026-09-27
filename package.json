@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Corevirus-ops/cc_ecommerce_project#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "passport": "^0.7.0",

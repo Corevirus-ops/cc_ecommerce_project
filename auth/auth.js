@@ -1,6 +1,16 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const pool = require('../db/pg');
+const bcrypt = require('bcrypt');
+
+async function verifyPassword(password, hashedPassword) {
+    return await bcrypt.compare(password, hashedPassword);
+}
+
+async function hashPassword(password) {
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
+}
 
 passport.use(new LocalStrategy(
     async (username, password, done) => {
@@ -10,7 +20,7 @@ passport.use(new LocalStrategy(
             if (!user) {
                 return done(null, false, { message: 'Incorrect username.' });
             }
-            if (user.password !== password) {
+            if (!await verifyPassword(password, user.password)) {
                 return done(null, false, { message: 'Incorrect password.' });
             }
             return done(null, user);
