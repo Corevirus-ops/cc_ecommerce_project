@@ -1,0 +1,27 @@
+{
+  "name": "cc_ecommerce_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Corevirus-ops/cc_ecommerce_project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Corevirus-ops/cc_ecommerce_project/issues"
+  },
+  "homepage": "https://github.com/Corevirus-ops/cc_ecommerce_project#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.23.0"
+  }
+}
