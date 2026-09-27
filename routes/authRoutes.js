@@ -5,39 +5,75 @@ const bcrypt = require('bcrypt');
 const pool = require('../db/pg');
 
 router.post('/login', passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/login'
-}));
+  session: true,
+  failWithError: true
+}), (req, res) => {
+  res.json({
+    message: 'Logged in successfully',
+    user: {
+      id: req.user.id,
+      username: req.user.username,
+      email: req.user.email
+    }
+  });
+}, (err, req, res, next) => {
+  if (err.status === 401) {
+    return res.status(401).json({ message: 'Invalid username or password' });
+  }
+  return next(err);
+});
 
 router.delete('/logout', (req, res, next) => {
   req.logout(err => {
     if (err) { return next(err); }
-    res.redirect('/');
+    req.session.destroy(sessionError => {
+      if (sessionError) { return next(sessionError); }
+      res.status(204).send();
+    });
   });
 });
 
 router.post('/register', async (req, res) => {
-  const { username, password, email } = req.body;
-  const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  try {
+    const { username, password, email } = req.body || {};
 
-    //check if user exists
-    const existingUser = await pool.query('SELECT * FROM users WHERE username = $1 OR email = $2', [username, email]);
-    if (existingUser.rows.length > 0) {
-        return res.status(400).json({ message: 'Username or email already exists' });
+    if (typeof username !== 'string' || typeof password !== 'string' || typeof email !== 'string' ||
+        !username.trim() || !password || !email.trim()) {
+      return res.status(400).json({ message: 'Username, password, and email are required' });
     }
 
-    await pool.query(
-        'INSERT INTO users (username, password, email) VALUES ($1, $2, $3)',
-        [username, hashedPassword, email]
+    const normalizedUsername = username.trim();
+    const normalizedEmail = email.trim();
+    const existingUser = await pool.query(
+      'SELECT id FROM users WHERE username = $1 OR email = $2',
+      [normalizedUsername, normalizedEmail]
     );
-    req.login({ username, email }, err => {
-        if (err) {
-            return res.status(500).json({ message: 'Error logging in after registration' });
-        }
-        return res.status(201).json({ message: 'User registered successfully' });
-    });
+    if (existingUser.rows.length > 0) {
+      return res.status(409).json({ message: 'Username or email already exists' });
+    }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await pool.query(
+      'INSERT INTO users (username, password, email) VALUES ($1, $2, $3) RETURNING username, email, id',
+      [normalizedUsername, hashedPassword, normalizedEmail]
+    );
+    const user = newUser.rows[0];
+
+    req.login(user, err => {
+      if (err) {
+        return res.status(500).json({ message: 'Error logging in after registration' });
+      }
+      return res.status(201).json({
+        message: 'User registered successfully',
+        user
+      });
+    });
+  } catch (err) {
+    if (err.code === '23505') {
+      return res.status(409).json({ message: 'Username or email already exists' });
+    }
+    return res.status(500).json({ message: 'Unable to register user' });
+  }
 });
 
 module.exports = router;
