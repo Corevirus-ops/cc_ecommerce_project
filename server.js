@@ -33,6 +33,9 @@ app.use('/', authRoutes);
 const userRoutes = require('./routes/userRoutes');
 app.use('/users', isAuthenticated, userRoutes);
 
+const productRoutes = require('./routes/productRoutes');
+app.use('/products', productRoutes);
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
