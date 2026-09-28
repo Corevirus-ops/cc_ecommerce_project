@@ -43,12 +43,43 @@ const removeCartItem = createAsyncThunk('cart/removeCartItem', async (id) => {
   return id;
 });
 
-const checkout = createAsyncThunk('cart/checkout', async () => {
+const checkout = createAsyncThunk('cart/checkout', async (_, { dispatch, getState }) => {
+  if (Object.keys(getState().cart.pendingChanges).length > 0) {
+    await dispatch(syncCart()).unwrap();
+  }
+
   const response = await fetch(`${url}/cart/checkout`, {
     method: 'POST',
     credentials: 'include'
   });
   return parseResponse(response);
+});
+
+const syncCart = createAsyncThunk('cart/syncCart', async (_, { getState }) => {
+  const pendingChanges = { ...getState().cart.pendingChanges };
+
+  await Promise.all(Object.entries(pendingChanges).map(async ([id, quantity]) => {
+    const response = quantity < 1
+      ? await fetch(`${url}/cart/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+      : await fetch(`${url}/cart/${id}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity })
+      });
+
+    await parseResponse(response);
+  }));
+
+  return pendingChanges;
+}, {
+  condition: (_, { getState }) => {
+    const { cart } = getState();
+    return cart.syncStatus !== 'syncing' && Object.keys(cart.pendingChanges).length > 0;
+  }
 });
 
 const cartSlice = createSlice({
@@ -58,6 +89,8 @@ const cartSlice = createSlice({
     items: [],
     status: 'idle',
     actionStatus: 'idle',
+    syncStatus: 'idle',
+    pendingChanges: {},
     error: null,
     checkoutResult: null
   },
@@ -66,6 +99,20 @@ const cartSlice = createSlice({
       state.cartId = null;
       state.items = [];
       state.error = null;
+      state.pendingChanges = {};
+    },
+    queueQuantityChange: (state, action) => {
+      const { id, quantity } = action.payload;
+      state.pendingChanges[id] = quantity;
+      state.error = null;
+
+      if (quantity < 1) {
+        state.items = state.items.filter(item => item.id !== id);
+        return;
+      }
+
+      const item = state.items.find(cartItem => cartItem.id === id);
+      if (item) item.quantity = quantity;
     }
   },
   extraReducers: (builder) => {
@@ -78,6 +125,7 @@ const cartSlice = createSlice({
         state.status = 'succeeded';
         state.cartId = action.payload.cartId;
         state.items = action.payload.items;
+        state.pendingChanges = {};
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.status = 'failed';
@@ -129,10 +177,26 @@ const cartSlice = createSlice({
       .addCase(checkout.rejected, (state, action) => {
         state.actionStatus = 'failed';
         state.error = action.error.message;
+      })
+      .addCase(syncCart.pending, (state) => {
+        state.syncStatus = 'syncing';
+        state.error = null;
+      })
+      .addCase(syncCart.fulfilled, (state, action) => {
+        Object.entries(action.payload).forEach(([id, quantity]) => {
+          if (state.pendingChanges[id] === quantity) {
+            delete state.pendingChanges[id];
+          }
+        });
+        state.syncStatus = 'idle';
+      })
+      .addCase(syncCart.rejected, (state, action) => {
+        state.syncStatus = 'failed';
+        state.error = action.error.message;
       });
   }
 });
 
-export const { clearCart } = cartSlice.actions;
-export { fetchCart, addCartItem, updateCartItem, removeCartItem, checkout };
+export const { clearCart, queueQuantityChange } = cartSlice.actions;
+export { fetchCart, addCartItem, updateCartItem, removeCartItem, checkout, syncCart };
 export default cartSlice.reducer;

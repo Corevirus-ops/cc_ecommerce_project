@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { checkout, fetchCart, removeCartItem, updateCartItem } from '../tools/cartSlice';
+import { checkout, fetchCart, queueQuantityChange } from '../tools/cartSlice';
 import './CartPage.css';
 
 export default function CartPage() {
@@ -11,6 +11,7 @@ export default function CartPage() {
     const cartItems = useSelector(state => state.cart.items);
     const cartStatus = useSelector(state => state.cart.status);
     const actionStatus = useSelector(state => state.cart.actionStatus);
+    const syncStatus = useSelector(state => state.cart.syncStatus);
     const error = useSelector(state => state.cart.error);
 
     useEffect(() => {
@@ -31,8 +32,7 @@ export default function CartPage() {
     }
 
     const handleQuantity = (item, quantity) => {
-        if (quantity < 1) return dispatch(removeCartItem(item.id));
-        dispatch(updateCartItem({ id: item.id, quantity }));
+        dispatch(queueQuantityChange({ id: item.id, quantity }));
     };
 
     const handleCheckout = async () => {
@@ -76,7 +76,7 @@ export default function CartPage() {
                                     <button type="button" onClick={() => handleQuantity(item, item.quantity + 1)} aria-label="Increase quantity">+</button>
                                 </div>
                                 <strong className="cart-item-total">${(Number(item.price || 0) * item.quantity).toFixed(2)}</strong>
-                                <button className="cart-remove" type="button" onClick={() => dispatch(removeCartItem(item.id))}>Remove</button>
+                                <button className="cart-remove" type="button" onClick={() => dispatch(queueQuantityChange({ id: item.id, quantity: 0 }))}>Remove</button>
                             </li>
                         ))}
                     </ul>
@@ -85,6 +85,8 @@ export default function CartPage() {
                         <div className="cart-total-row"><span>Subtotal</span><strong>${total.toFixed(2)}</strong></div>
                         <p className="cart-note">Taxes and delivery are calculated at the final stage of the journey.</p>
                         {error && <p className="cart-error" role="alert">{error}</p>}
+                        {syncStatus === 'syncing' && <p className="cart-sync-status">Saving your changes...</p>}
+                        {syncStatus === 'failed' && <p className="cart-sync-status" role="alert">Changes will retry shortly.</p>}
                         <button className="cart-checkout" type="button" disabled={actionStatus === 'loading'} onClick={handleCheckout}>
                             {actionStatus === 'loading' ? 'Preparing...' : 'Place the order'}
                         </button>

@@ -4,7 +4,7 @@ import {Routes, Route} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getCurrentUser } from './tools/auth';
-import { fetchCart } from './tools/cartSlice';
+import { fetchCart, syncCart } from './tools/cartSlice';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import ProductsListingPage from './pages/ProductsListingPage';
@@ -46,6 +46,16 @@ function App() {
       dispatch(fetchCart());
     }
   }, [cartStatus, dispatch, user]);
+
+  useEffect(() => {
+    if (!user) return undefined;
+
+    const interval = window.setInterval(() => {
+      dispatch(syncCart());
+    }, 1200);
+
+    return () => window.clearInterval(interval);
+  }, [dispatch, user]);
 
 
 

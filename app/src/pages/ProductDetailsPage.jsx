@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { fetchProductById, clearProductDetails } from '../tools/productDetailsSlice';
-import { addCartItem, removeCartItem, updateCartItem } from '../tools/cartSlice';
+import { addCartItem, queueQuantityChange } from '../tools/cartSlice';
 import './ProductDetailsPage.css';
 
 export default function ProductDetailsPage() {
@@ -30,14 +30,14 @@ export default function ProductDetailsPage() {
 
     const handleDecrease = () => {
         if (cartItem.quantity === 1) {
-            dispatch(removeCartItem(cartItem.id));
+            dispatch(queueQuantityChange({ id: cartItem.id, quantity: 0 }));
             return;
         }
-        dispatch(updateCartItem({ id: cartItem.id, quantity: cartItem.quantity - 1 }));
+        dispatch(queueQuantityChange({ id: cartItem.id, quantity: cartItem.quantity - 1 }));
     };
 
     const handleIncrease = () => {
-        dispatch(updateCartItem({ id: cartItem.id, quantity: cartItem.quantity + 1 }));
+        dispatch(queueQuantityChange({ id: cartItem.id, quantity: cartItem.quantity + 1 }));
     };
 
     if (status === 'loading' || status === 'idle') {
