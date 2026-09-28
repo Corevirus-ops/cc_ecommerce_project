@@ -2,7 +2,7 @@
 import {useNavigate} from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { login, setUser, facebookLogin } from '../tools/auth';
+import { login, setUser, facebookLogin, googleLogin } from '../tools/auth';
 
 export default function Login() {
     const [form, setForm] = useState({ username: '', password: '' });
@@ -59,6 +59,7 @@ export default function Login() {
         <button type="submit">Login</button>
         <button type="button" onClick={() => navigate('/register')}>Go to Register</button>
         <button type="button" onClick={() => dispatch(facebookLogin())}>Login with Facebook</button>
+        <button type="button" onClick={() => dispatch(googleLogin())}>Login with Google</button>
       </form>
     </div>
   );

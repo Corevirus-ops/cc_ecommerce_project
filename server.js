@@ -35,6 +35,9 @@ async function isAuthenticated(req, res, next) {
 const facebookAuthRoutes = require('./routes/facebookAuthRoutes');
 app.use('/auth/facebook', facebookAuthRoutes);
 
+const googleAuthRoutes = require('./routes/googleAuthRoutes');
+app.use('/auth/google', googleAuthRoutes);
+
 
 
 const authRoutes = require('./routes/authRoutes');
