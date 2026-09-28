@@ -21,7 +21,7 @@ const getCurrentUser = createAsyncThunk(
 
 const login = createAsyncThunk(
     'auth/login',
-    async (credentials) => {
+    async (credentials, { rejectWithValue }) => {
         const response = await fetch(`${url}/login`, {
             method: 'POST',
             credentials: 'include',
@@ -30,7 +30,11 @@ const login = createAsyncThunk(
             },
             body: JSON.stringify(credentials)
         })
-        return response
+        const data = await response.json()
+        if (!response.ok) {
+            return rejectWithValue(data)
+        }
+        return data
     }
 )
 

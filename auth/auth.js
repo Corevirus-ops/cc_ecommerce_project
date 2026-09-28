@@ -11,10 +11,11 @@ async function verifyPassword(password, hashedPassword) {
 passport.use(new LocalStrategy(
     async (username, password, done) => {
         try {
-            const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
+            const userPrim = username.includes('@') ? 'email' : 'username';
+            const result = await pool.query(`SELECT * FROM users WHERE ${userPrim} = $1`, [username]);
             const user = result.rows[0];
             if (!user) {
-                return done(null, false, { message: 'Incorrect username.' });
+                return done(null, false, { message: `Incorrect ${userPrim}.` });
             }
             if (!await verifyPassword(password, user.password)) {
                 return done(null, false, { message: 'Incorrect password.' });

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getCurrentUser, logout, clearUser } from './tools/auth';
 import Register from './pages/Register';
+import Login from './pages/Login';
 
 const TestPage = ({user}) => {
   const dispatch = useDispatch();
@@ -41,6 +42,7 @@ useEffect(() => {
     <Routes>
       <Route path="/" element={<TestPage user={user} />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
     </Routes>
   )
 }

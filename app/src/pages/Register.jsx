@@ -71,6 +71,7 @@ export default function Register() {
             />
             {error && <p role="alert">{error}</p>}
             <button type="submit">Submit</button>
+            <button type="button" onClick={() => navigate('/login')}>Go to Login</button>
         </form>
     );
 }
