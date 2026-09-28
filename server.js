@@ -3,11 +3,16 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const passport = require('./auth/auth');
+const cors = require('cors');
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true
+}));
 
 
 app.use(session({
@@ -25,6 +30,7 @@ async function isAuthenticated(req, res, next) {
   }
   res.status(401).json({ message: 'Unauthorized' });
 }
+
 
 
 const authRoutes = require('./routes/authRoutes');
