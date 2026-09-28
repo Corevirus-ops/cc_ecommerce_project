@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { fetchProductById, clearProductDetails } from '../tools/productDetailsSlice';
+import { addCartItem, removeCartItem, updateCartItem } from '../tools/cartSlice';
 import './ProductDetailsPage.css';
 
 export default function ProductDetailsPage() {
@@ -11,6 +12,9 @@ export default function ProductDetailsPage() {
     const product = useSelector(state => state.productDetails.item);
     const status = useSelector(state => state.productDetails.status);
     const error = useSelector(state => state.productDetails.error);
+    const user = useSelector(state => state.auth.user);
+    const cartActionStatus = useSelector(state => state.cart.actionStatus);
+    const cartItem = useSelector(state => state.cart.items.find(item => item.product_id === Number(id)));
 
     useEffect(() => {
         dispatch(fetchProductById(id));
@@ -18,6 +22,23 @@ export default function ProductDetailsPage() {
             dispatch(clearProductDetails());
         };
     }, [dispatch, id]);
+
+    const handleAddToCart = () => {
+        if (!user) return;
+        dispatch(addCartItem({ productId: product.id, quantity: 1 }));
+    };
+
+    const handleDecrease = () => {
+        if (cartItem.quantity === 1) {
+            dispatch(removeCartItem(cartItem.id));
+            return;
+        }
+        dispatch(updateCartItem({ id: cartItem.id, quantity: cartItem.quantity - 1 }));
+    };
+
+    const handleIncrease = () => {
+        dispatch(updateCartItem({ id: cartItem.id, quantity: cartItem.quantity + 1 }));
+    };
 
     if (status === 'loading' || status === 'idle') {
         return <main className="product-details-state" role="status">Loading product...</main>;
@@ -46,7 +67,25 @@ export default function ProductDetailsPage() {
                     </p>
                     <div className="product-details-purchase">
                         <span className="product-details-price">${Number(product.price || 0).toFixed(2)}</span>
-                        <span className="product-details-availability">Available now</span>
+                        {!cartItem ? (
+                            <button
+                                className="product-details-add"
+                                type="button"
+                                disabled={!user || cartActionStatus === 'loading'}
+                                onClick={handleAddToCart}
+                            >
+                                {!user ? 'Sign in to add' : cartActionStatus === 'loading' ? 'Adding...' : 'Add to cart'}
+                            </button>
+                        ) : (
+                            <div className="product-details-cart-control">
+                                <span className="product-details-cart-count">{cartItem.quantity} in your cart</span>
+                                <div className="product-details-quantity" aria-label={`Quantity of ${product.name} in cart`}>
+                                    <button type="button" onClick={handleDecrease} disabled={cartActionStatus === 'loading'} aria-label="Decrease quantity">-</button>
+                                    <strong>{cartItem.quantity}</strong>
+                                    <button type="button" onClick={handleIncrease} disabled={cartActionStatus === 'loading'} aria-label="Increase quantity">+</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>

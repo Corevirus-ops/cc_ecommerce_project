@@ -4,10 +4,12 @@ import {Routes, Route} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getCurrentUser } from './tools/auth';
+import { fetchCart } from './tools/cartSlice';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import ProductsListingPage from './pages/ProductsListingPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
+import CartPage from './pages/CartPage';
 import Navbar from './components/Navbar';
 
 const HomePage = ({ user }) => {
@@ -31,12 +33,19 @@ function App() {
 
   const dispatch = useDispatch();
   const user = useSelector(state => state.auth.user);
+  const cartStatus = useSelector(state => state.cart.status);
 
   useEffect(() => {
     if (!user) {
       dispatch(getCurrentUser());
     }
   }, [dispatch, user]);
+
+  useEffect(() => {
+    if (user && cartStatus === 'idle') {
+      dispatch(fetchCart());
+    }
+  }, [cartStatus, dispatch, user]);
 
 
 
@@ -49,6 +58,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/products" element={<ProductsListingPage />} />
         <Route path="/products/:id" element={<ProductDetailsPage />} />
+        <Route path="/cart" element={<CartPage />} />
       </Routes>
     </div>
   )

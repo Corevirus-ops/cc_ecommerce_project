@@ -7,8 +7,10 @@ import './Navbar.css';
 export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const user = useSelector(state => state.auth.user);
+    const cartItems = useSelector(state => state.cart.items);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const cartCount = cartItems.reduce((total, item) => total + Number(item.quantity || 0), 0);
 
     const closeMenu = () => setMenuOpen(false);
 
@@ -44,8 +46,9 @@ export default function Navbar() {
                 <NavLink className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'} to="/products" onClick={closeMenu}>
                     The collection
                 </NavLink>
-                <NavLink className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'} to="/cart" onClick={closeMenu}>
-                    Cart
+                <NavLink className={({ isActive }) => isActive ? 'nav-link cart-link active' : 'nav-link cart-link'} to="/cart" onClick={closeMenu}>
+                    <span>Cart</span>
+                    {cartCount > 1 && <span className="cart-badge" aria-label={`${cartCount} items in cart`}>{cartCount}</span>}
                 </NavLink>
                 {user ? (
                     <>

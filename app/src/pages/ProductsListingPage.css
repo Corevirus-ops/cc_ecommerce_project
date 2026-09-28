@@ -204,6 +204,33 @@
   border-top: 1px solid var(--border);
 }
 
+.product-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-card-actions button {
+  padding: 8px 10px;
+  border: 1px solid var(--ember);
+  color: var(--paper);
+  background: var(--ember);
+  font: 700 10px/1 var(--mono);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.product-card-actions button:hover:not(:disabled) {
+  color: var(--ink);
+  background: var(--frost);
+}
+
+.product-card-actions button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
 .product-price {
   color: var(--ink);
   font: 700 22px/1 var(--heading);

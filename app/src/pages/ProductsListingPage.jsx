@@ -3,6 +3,8 @@ import { fetchProducts } from '../tools/productSlice';
 import { useEffect, useMemo, useState } from 'react';
 import ProductsListingCard from '../components/ProductsListingCard';
 import './ProductsListingPage.css';
+import { addCartItem } from '../tools/cartSlice';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function ProductsListingPage() {
@@ -10,6 +12,9 @@ export default function ProductsListingPage() {
     const products = useSelector(state => state.products.items);
     const productStatus = useSelector(state => state.products.status);
     const productError = useSelector(state => state.products.error);
+    const user = useSelector(state => state.auth.user);
+    const cartActionStatus = useSelector(state => state.cart.actionStatus);
+    const navigate = useNavigate();
     const [query, setQuery] = useState('');
     const [sort, setSort] = useState('featured');
 
@@ -33,6 +38,14 @@ export default function ProductsListingPage() {
             return first.id - second.id;
         });
     }, [products, query, sort]);
+
+    const handleAddToCart = (product) => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+        dispatch(addCartItem({ productId: product.id, quantity: 1 }));
+    };
 
     return (
         <main className="products-page">
@@ -84,7 +97,11 @@ export default function ProductsListingPage() {
                     <ul className="products-grid">
                         {visibleProducts.map(product => (
                             <li key={product.id}>
-                            <ProductsListingCard product={product} />
+                            <ProductsListingCard
+                                product={product}
+                                onAdd={() => handleAddToCart(product)}
+                                adding={cartActionStatus === 'loading'}
+                            />
                             </li>
                         ))}
                     </ul>

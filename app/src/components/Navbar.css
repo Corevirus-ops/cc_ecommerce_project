@@ -76,6 +76,27 @@
   padding: 29px 0;
 }
 
+.cart-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cart-badge {
+  display: inline-grid;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 4px;
+  box-sizing: border-box;
+  place-items: center;
+  border: 1px solid var(--ember);
+  border-radius: 50%;
+  color: var(--paper);
+  background: var(--ember);
+  font: 700 10px/1 var(--mono);
+  letter-spacing: 0;
+}
+
 .nav-link::after {
   position: absolute;
   right: 0;
@@ -191,6 +212,10 @@
   .nav-user,
   .nav-cta {
     padding: 17px 0;
+  }
+
+  .cart-link {
+    justify-content: flex-start;
   }
 
   .nav-link::after {
