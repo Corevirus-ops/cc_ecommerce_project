@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-const url = 'http://localhost:3000'; 
+import url from './url'
 
 const getCurrentUser = createAsyncThunk(
     'auth/getCurrentUser',

@@ -1,0 +1,125 @@
+.product-details-page {
+  min-height: 100svh;
+  padding: 32px clamp(20px, 6vw, 90px) 80px;
+  color: #263238;
+  background: #f3f0e8;
+  text-align: left;
+}
+
+.product-details-back {
+  display: inline-block;
+  margin-bottom: 34px;
+  color: #b14c32;
+  font: 700 12px/1.2 var(--mono);
+  letter-spacing: 0.8px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.product-details-back:hover,
+.product-details-back:focus-visible {
+  color: #263238;
+  text-decoration: underline;
+}
+
+.product-details-panel {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.35fr) minmax(0, 1fr);
+  gap: clamp(28px, 7vw, 110px);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(28px, 6vw, 76px);
+  border: 1px solid #c9c7bd;
+  background: #faf8f2;
+}
+
+.product-details-mark {
+  color: #b14c32;
+  font: 700 clamp(42px, 7vw, 84px)/0.9 Georgia, 'Times New Roman', serif;
+}
+
+.product-details-copy {
+  max-width: 660px;
+}
+
+.product-details-eyebrow {
+  margin: 0 0 16px;
+  color: #b14c32;
+  font: 700 12px/1.2 var(--mono);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.product-details-copy h1 {
+  margin: 0;
+  color: #263238;
+  font: 700 clamp(42px, 7vw, 86px)/0.95 Georgia, 'Times New Roman', serif;
+  letter-spacing: 0;
+}
+
+.product-details-description {
+  max-width: 580px;
+  margin: 28px 0 48px;
+  color: #637078;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.product-details-purchase {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 20px;
+  border-top: 1px solid #dedbd1;
+}
+
+.product-details-price {
+  color: #263238;
+  font: 700 30px/1 Georgia, 'Times New Roman', serif;
+}
+
+.product-details-availability {
+  color: #637078;
+  font: 11px/1.2 var(--mono);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.product-details-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-height: 60svh;
+  padding: 80px 20px;
+  color: #637078;
+  background: #f3f0e8;
+  text-align: center;
+}
+
+.product-details-state strong {
+  color: #263238;
+  font: 700 26px/1.1 Georgia, 'Times New Roman', serif;
+}
+
+.product-details-state a {
+  color: #b14c32;
+  font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  .product-details-panel {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  .product-details-mark {
+    font-size: 42px;
+  }
+
+  .product-details-purchase {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

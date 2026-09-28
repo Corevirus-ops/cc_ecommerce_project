@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, setUser, facebookLogin, googleLogin } from '../tools/auth';
+import './AuthPage.css';
 
 export default function Login() {
     const [form, setForm] = useState({ username: '', password: '' });
@@ -38,9 +39,12 @@ export default function Login() {
     };
 
   return (
-    <div>
-      <h1>Login Page</h1>
-      <form onSubmit={handleSubmit}>
+    <main className="auth-page">
+      <section className="auth-panel">
+        <p className="auth-eyebrow">Return to the hearth</p>
+        <h1>Welcome back.</h1>
+        <p className="auth-intro">Sign in to continue your journey through the collection.</p>
+        <form className="auth-form" onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="Email or Username"
@@ -56,11 +60,15 @@ export default function Login() {
           onChange={handleChange}
         />
         {error && <p role="alert">{error}</p>}
-        <button type="submit">Login</button>
-        <button type="button" onClick={() => navigate('/register')}>Go to Register</button>
-        <button type="button" onClick={() => dispatch(facebookLogin())}>Login with Facebook</button>
-        <button type="button" onClick={() => dispatch(googleLogin())}>Login with Google</button>
-      </form>
-    </div>
+          <button className="auth-submit" type="submit">Enter the hall</button>
+          <button className="auth-secondary" type="button" onClick={() => navigate('/register')}>Create an account</button>
+          <div className="auth-divider"><span>or continue with</span></div>
+          <div className="auth-providers">
+            <button type="button" onClick={() => dispatch(facebookLogin())}>Facebook</button>
+            <button type="button" onClick={() => dispatch(googleLogin())}>Google</button>
+          </div>
+        </form>
+      </section>
+    </main>
   );
 }
