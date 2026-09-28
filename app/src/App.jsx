@@ -10,6 +10,9 @@ import Login from './pages/Login';
 import ProductsListingPage from './pages/ProductsListingPage';
 import ProductDetailsPage from './pages/ProductDetailsPage';
 import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrdersPage from './pages/OrdersPage';
+import OrderDetailPage from './pages/OrderDetailPage';
 import Navbar from './components/Navbar';
 
 const HomePage = ({ user }) => {
@@ -69,6 +72,10 @@ function App() {
         <Route path="/products" element={<ProductsListingPage />} />
         <Route path="/products/:id" element={<ProductDetailsPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/checkout/success" element={<CheckoutPage success />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders/:id" element={<OrderDetailPage />} />
       </Routes>
     </div>
   )

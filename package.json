@@ -33,6 +33,7 @@
     "passport-google": "^0.3.0",
     "passport-google-oidc": "^0.1.0",
     "passport-local": "^1.0.0",
-    "pg": "^8.23.0"
+    "pg": "^8.23.0",
+    "stripe": "^22.6.2"
   }
 }

@@ -55,6 +55,9 @@ app.use('/cart', isAuthenticated, cartRoutes);
 const orderRoutes = require('./routes/orderRoutes');
 app.use('/orders', isAuthenticated, orderRoutes);
 
+const paymentRoutes = require('./routes/paymentRoutes');
+app.use('/payments', isAuthenticated, paymentRoutes);
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

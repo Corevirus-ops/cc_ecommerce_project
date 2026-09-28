@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { checkout, fetchCart, queueQuantityChange } from '../tools/cartSlice';
+import { fetchCart, queueQuantityChange } from '../tools/cartSlice';
 import './CartPage.css';
 
 export default function CartPage() {
@@ -33,11 +33,6 @@ export default function CartPage() {
 
     const handleQuantity = (item, quantity) => {
         dispatch(queueQuantityChange({ id: item.id, quantity }));
-    };
-
-    const handleCheckout = async () => {
-        const result = await dispatch(checkout());
-        if (checkout.fulfilled.match(result)) navigate('/');
     };
 
     return (
@@ -87,8 +82,8 @@ export default function CartPage() {
                         {error && <p className="cart-error" role="alert">{error}</p>}
                         {syncStatus === 'syncing' && <p className="cart-sync-status">Saving your changes...</p>}
                         {syncStatus === 'failed' && <p className="cart-sync-status" role="alert">Changes will retry shortly.</p>}
-                        <button className="cart-checkout" type="button" disabled={actionStatus === 'loading'} onClick={handleCheckout}>
-                            {actionStatus === 'loading' ? 'Preparing...' : 'Place the order'}
+                        <button className="cart-checkout" type="button" disabled={actionStatus === 'loading'} onClick={() => navigate('/checkout')}>
+                            Proceed to secure payment
                         </button>
                     </aside>
                 </div>

@@ -50,6 +50,7 @@ export default function Navbar() {
                     <span>Cart</span>
                     {cartCount > 1 && <span className="cart-badge" aria-label={`${cartCount} items in cart`}>{cartCount}</span>}
                 </NavLink>
+                {user && <NavLink className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'} to="/orders" onClick={closeMenu}>Orders</NavLink>}
                 {user ? (
                     <>
                         <span className="nav-user">Welcome, {user.username}</span>
