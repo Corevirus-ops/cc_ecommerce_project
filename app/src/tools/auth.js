@@ -3,7 +3,7 @@ const url = 'http://localhost:3000';
 
 const getCurrentUser = createAsyncThunk(
     'auth/getCurrentUser',
-    async () => {
+    async (_, { rejectWithValue }) => {
         const response = await fetch(`${url}/users`, {
             method: 'GET',
             credentials: 'include',
@@ -11,7 +11,11 @@ const getCurrentUser = createAsyncThunk(
                 'Content-Type': 'application/json'
             }
         })
-        return response.json()
+        const data = await response.json()
+        if (!response.ok) {
+            return rejectWithValue(data)
+        }
+        return data
     }
 )
 
@@ -26,7 +30,7 @@ const login = createAsyncThunk(
             },
             body: JSON.stringify(credentials)
         })
-        return response.json()
+        return response
     }
 )
 
@@ -40,7 +44,27 @@ const logout = createAsyncThunk(
                 'Content-Type': 'application/json'
             }
         })
-        return response.status === 204 ? null : response.json()
+        return response.status === 204 ? null : response
+    }
+)
+
+const register = createAsyncThunk(
+    'auth/register',
+    async (credentials, { rejectWithValue }) => {
+        const { ...registrationData } = credentials;
+        const response = await fetch(`${url}/register`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(registrationData)
+        })
+        const data = await response.json()
+        if (!response.ok) {
+            return rejectWithValue(data)
+        }
+        return data
     }
 )
 
@@ -58,8 +82,18 @@ const authSlice = createSlice({
             state.user = null
         },
     }
+    ,
+    extraReducers: (builder) => {
+        builder
+            .addCase(getCurrentUser.fulfilled, (state, action) => {
+                state.user = action.payload
+            })
+            .addCase(getCurrentUser.rejected, (state) => {
+                state.user = null
+            })
+    }
 })
 
 export const { setUser, clearUser } = authSlice.actions
-export { getCurrentUser, login, logout }
+export { getCurrentUser, login, logout, register }
 export default authSlice.reducer
