@@ -2,7 +2,7 @@
 import {useNavigate} from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { login, setUser } from '../tools/auth';
+import { login, setUser, facebookLogin } from '../tools/auth';
 
 export default function Login() {
     const [form, setForm] = useState({ username: '', password: '' });
@@ -36,6 +36,7 @@ export default function Login() {
             [name]: value,
         }));
     };
+
   return (
     <div>
       <h1>Login Page</h1>
@@ -57,6 +58,7 @@ export default function Login() {
         {error && <p role="alert">{error}</p>}
         <button type="submit">Login</button>
         <button type="button" onClick={() => navigate('/register')}>Go to Register</button>
+        <button type="button" onClick={() => dispatch(facebookLogin())}>Login with Facebook</button>
       </form>
     </div>
   );

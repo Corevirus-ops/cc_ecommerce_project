@@ -38,6 +38,13 @@ const login = createAsyncThunk(
     }
 )
 
+const facebookLogin = createAsyncThunk(
+    'auth/facebookLogin',
+    async () => {
+        window.location.href = `${url}/auth/facebook`;
+    }
+)
+
 const logout = createAsyncThunk(
     'auth/logout',
     async () => {
@@ -99,5 +106,5 @@ const authSlice = createSlice({
 })
 
 export const { setUser, clearUser } = authSlice.actions
-export { getCurrentUser, login, logout, register }
+export { getCurrentUser, login, logout, register, facebookLogin }
 export default authSlice.reducer

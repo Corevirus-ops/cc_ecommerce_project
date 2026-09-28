@@ -15,6 +15,7 @@ app.use(cors({
 }));
 
 
+
 app.use(session({
   secret: process.env.SECRET,
   resave: false,
@@ -30,6 +31,9 @@ async function isAuthenticated(req, res, next) {
   }
   res.status(401).json({ message: 'Unauthorized' });
 }
+
+const facebookAuthRoutes = require('./routes/facebookAuthRoutes');
+app.use('/auth/facebook', facebookAuthRoutes);
 
 
 
